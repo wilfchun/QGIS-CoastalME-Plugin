@@ -1,0 +1,9 @@
+location == Geometry Control File (.tgc)
+
+command == Read GIS Z Shape
+
+description == Used to update topography within a model. Polylines are treated as breaklines in the model’s topography (with the breakline height or elevation varying along its length). Polygons and point features can be used to create TINs which are either independent of, or alternatively merge with the surrounding topography.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Geometry_Control_file_.28TGC.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/TwoD-Domains-1.html#tab:tab-ZShapeAttribute

@@ -1,0 +1,9 @@
+location == COASTALME Control File (.tcf)
+
+command == Read GIS FC
+
+description == Used for 2D flow constrictions, representing additional losses associated with bridges or box culverts. This command has been superseded with the TGC commands:\n\tRead GIS FC Shape\nRead GIS Layered FC Shape.\n\tThe template file and command only remain for the purpose of version backward compatibility.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Control_file_.28TCF.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/TwoD-Domains-1.html#tab:tab-FlowConstriction

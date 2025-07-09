@@ -1,0 +1,4 @@
+Define Event == 1in0005
+    BC Event Source == ~ARI~ | 1in0005
+    Output Folder == <<OUTPUT_FOLDER>>\1in0005
+End Define

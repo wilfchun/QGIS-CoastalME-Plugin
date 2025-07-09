@@ -1,0 +1,5 @@
+location == AD Global Database
+
+description == Sets the minimum dispersion coefficients for a given tracer in the COASTALME AD module. File is read into the minimum dispersion field of the AD Global Database (.csv) file.
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/AD-1.html#minimum-dispersion-coefficient

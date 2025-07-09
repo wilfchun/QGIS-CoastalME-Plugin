@@ -1,0 +1,9 @@
+location == Geometry Control File (.tgc)
+
+command == Read GIS Variable Z Shape
+
+description == Used to define the final 3D shape of the Zpts at the completion of a breach, or other change in topographic shape, during a simulation.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Geometry_Control_file_.28TGC.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/TwoD-Domains-1.html#vzsh-4

@@ -1,0 +1,232 @@
+! ------------------------------------------------------------------------
+! Define Storm Event Definitions	(~e1~)
+! ------------------------------------------------------------------------
+
+Define Event == 12.00EY
+ BC Event Source == ~AEP~ | 12.00EY
+ Blockage AEP == 99.99
+End Define
+
+Define Event == 99.75pct
+ BC Event Source == ~AEP~ | 99.75pct
+ Blockage AEP == 99.75
+End Define
+
+Define Event == 98.17pct
+ BC Event Source == ~AEP~ | 98.17pct
+ Blockage AEP == 98.17
+End Define
+
+Define Event == 95.02pct
+ BC Event Source == ~AEP~ | 95.02pct
+ Blockage AEP == 95.02
+End Define
+
+Define Event == 86.47pct
+ BC Event Source == ~AEP~ | 86.47pct
+ Blockage AEP == 86.47
+End Define
+
+Define Event == 63.20pct
+ BC Event Source == ~AEP~ | 63.20pct
+ Blockage AEP == 63.20
+End Define
+
+Define Event == 50.00pct
+ BC Event Source == ~AEP~ | 50.00pct
+ Blockage AEP == 50.00
+End Define
+
+Define Event == 39.35pct
+ BC Event Source == ~AEP~ | 39.35pct
+ Blockage AEP == 39.35
+End Define
+
+Define Event == 20.00pct
+ BC Event Source == ~AEP~ | 20.00pct
+ Blockage AEP == 20.00
+End Define
+
+Define Event == 18.13pct
+ BC Event Source == ~AEP~ | 18.13pct
+ Blockage AEP == 18.13
+End Define
+
+Define Event == 10.00pct
+ BC Event Source == ~AEP~ | 10.00pct
+ Blockage AEP == 10.00
+End Define
+
+Define Event == 05.00pct 
+ BC Event Source == ~AEP~ | 05.00pct
+ Blockage AEP == 5.00
+End Define
+
+Define Event == 02.00pct
+ BC Event Source == ~AEP~ | 02.00pct
+ Blockage AEP == 2.00
+End Define
+
+Define Event == 01.00pct
+ BC Event Source == ~AEP~ | 01.00pct
+ Blockage AEP == 1.00
+End Define
+
+Define Event == 00.50pct
+ BC Event Source == ~AEP~ | 00.50pct
+ Blockage AEP == 0.50
+End Define
+
+Define Event == 00.20pct
+ BC Event Source == ~AEP~ | 00.20pct
+ Blockage AEP == 0.20
+End Define
+
+Define Event == 00.10pct
+ BC Event Source == ~AEP~ | 00.10pct
+ Blockage AEP == 0.10
+End Define
+
+Define Event == 00.05pct
+ BC Event Source == ~AEP~ | 00.05pct
+ Blockage AEP == 0.05
+End Define
+
+Define Event == PMF
+ BC Event Source == ~AEP~ | PMF
+ Blockage AEP == 0.000001				! Need to calculate this using ARR19
+End Define
+
+Define Event == DEM						! Used for making high-resolution DEM_Z file when DEM_Z_HR is broken
+ BC Event Source == ~AEP~ | 01.00pct
+ Blockage AEP == 1.00
+End Define
+
+! ------------------------------------------------------------------------
+! Define Storm Duration Definitions		(~e2~)
+! ------------------------------------------------------------------------
+
+Define Event == 00.17H 					! 10mins
+ BC Event Source == ~DURN~ | 00.17H
+ End Time == 12
+End Define
+
+Define Event == 00.25H 					! 15mins
+ BC Event Source == ~DURN~ | 00.25H
+ End Time == 12
+End Define
+
+Define Event == 00.33H 					! 20mins
+ BC Event Source == ~DURN~ | 00.33H
+ End Time == 12
+End Define
+
+Define Event == 00.42H 					! 25mins
+ BC Event Source == ~DURN~ | 00.42H
+ End Time == 12
+End Define
+
+Define Event == 00.50H 					! 30mins
+ BC Event Source == ~DURN~ | 00.50H
+ End Time == 12
+End Define
+
+Define Event == 00.75H 					! 45mins
+ BC Event Source == ~DURN~ | 00.75H
+ End Time == 12
+End Define
+
+Define Event == 01.00H
+ BC Event Source == ~DURN~ | 01.00H
+ End Time == 12
+End Define
+
+Define Event == 01.50H
+ BC Event Source == ~DURN~ | 01.50H
+ End Time == 12
+End Define
+
+Define Event == 02.00H
+ BC Event Source == ~DURN~ | 02.00H
+ End Time == 13
+End Define
+
+Define Event == 03.00H
+ BC Event Source == ~DURN~ | 03.00H
+ End Time == 14
+End Define
+
+Define Event == 04.50H
+ BC Event Source == ~DURN~ | 04.50H
+ End Time == 16
+End Define
+
+Define Event == 06.00H
+ BC Event Source == ~DURN~ | 06.00H
+ End Time == 18
+End Define
+
+Define Event == 09.00H
+ BC Event Source == ~DURN~ | 09.00H
+ End Time == 24
+End Define
+
+Define Event == 12.00H
+ BC Event Source == ~DURN~ | 12.00H
+ End Time == 32
+End Define
+
+Define Event == 18.00H
+ BC Event Source == ~DURN~ | 18.00H
+ End Time == 38
+End Define
+
+Define Event == 24.00H
+ BC Event Source == ~DURN~ | 24.00H
+ End Time == 42
+End Define
+
+Define Event == 30.00H
+ BC Event Source == ~DURN~ | 30.00H
+ End Time == 60
+End Define
+
+Define Event == 36.00H
+ BC Event Source == ~DURN~ | 36.00H
+ End Time == 72
+End Define
+
+Define Event == 48.00H
+ BC Event Source == ~DURN~ | 48.00H
+ End Time == 96
+End Define
+
+Define Event == 72.00H
+ BC Event Source == ~DURN~ | 72.00H
+ End Time == 120
+End Define
+
+Define Event == 96.00H
+ BC Event Source == ~DURN~ | 96.00H
+ End Time == 120
+End Define
+
+Define Event == 120.00H
+ BC Event Source == ~DURN~ | 120.00H
+ End Time == 145
+End Define
+
+Define Event == 144.00H
+ BC Event Source == ~DURN~ | 144.00H
+ End Time == 165
+End Define
+
+Define Event == 168.00H
+ BC Event Source == ~DURN~ | 168.00H
+ End Time == 190
+End Define
+
+Define Event == _						! Used for making high-resolution DEM_Z file when DEM_Z_HR is broken
+ BC Event Source == ~DURN~ | 01.00H
+ End Time == 0.0001
+End Define

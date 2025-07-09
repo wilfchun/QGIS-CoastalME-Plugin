@@ -1,0 +1,9 @@
+location == ESTRY Control File (.ecf)
+
+command == Read GIS Network
+
+description == Used to define grouped structure locations and attributes. For example, weirs representing overtopping of a bridge or culvert structure can be specified using a single GIS feature in the 1d_nwke file. By comparison, multiple line features would be required if the same input was defined in a 1d_nwk file.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#ESTRY_Control_file_.28ECF.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/OneD-Domains-1.html#Auto-Weir-4

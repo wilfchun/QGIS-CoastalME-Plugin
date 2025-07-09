@@ -1,0 +1,2 @@
+SHP Projection == ../model/gis/projection.prj
+Create TIN Zpts == ../model/gis/2d_ztin_EG07_011_R.shp | ../model/gis/2d_ztin_EG07_011_L.shp | ../model/gis/2d_ztin_EG07_011_P.shp

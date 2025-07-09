@@ -1,9 +1,0 @@
-location == TUFLOW Control File (.tcf)
-
-command == Read GIS IWL
-
-description == Sets the initial water level in the model at the start of the simulation. The initial water level can vary spatially within the model. An equivalent initial Water level command also exists in the TGC.
-
-wiki link == https://wiki.tuflow.com/TUFLOW_Empty_Files#TUFLOW_Control_file_.28TCF.29
-
-manual link == https://docs.tuflow.com/classic-hpc/manual/2025.0/Boundaries-InitialConditions-1.html#IWL-2D-4

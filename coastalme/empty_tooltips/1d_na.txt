@@ -1,0 +1,9 @@
+location == ESTRY Control File (.ecf)
+
+command == Read GIS Table Links
+
+description == Used to set nodal surface areas.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#ESTRY_Control_file_.28ECF.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/OneD-Domains-1.html#NA-Table-4

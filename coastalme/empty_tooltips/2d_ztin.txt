@@ -1,0 +1,9 @@
+location == Geometry Control File (.tgc)
+
+command == Create Tin Zpts
+
+description == Used to update topography within a model.
+
+wiki link == https://wiki.coastalme.com/index.php?title=COASTALME_Empty_Files#COASTALME_Geometry_Control_file_.28TGC.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/TwoD-Domains-1.html#ztin-4

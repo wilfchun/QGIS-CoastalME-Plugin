@@ -1,0 +1,9 @@
+location == Geometry Control File (.tgc)
+
+command == Read GIS Layered FC Shape
+
+description == Used in conjunction with 2d_lfcsh to modify elevations along 2d_lfcsh polyline. 2d_lfcsh_pts has reduced number of attributes to only relevant fields for point objects. 
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Geometry_Control_file_.28TGC.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/TwoD-Domains-1.html#tab:tab-ShapePoint

@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>coastalmeqgis_insert_coastalme_attributes</class>
+ <widget class="QDialog" name="coastalmeqgis_insert_coastalme_attributes">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>453</width>
+    <height>330</height>
+   </rect>
+  </property>
+  <property name="mouseTracking">
+   <bool>false</bool>
+  </property>
+  <property name="windowTitle">
+   <string>Insert COASTALME attributes to existing GIS layer</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="label1">
+       <property name="text">
+        <string>Empty Directory</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLineEdit" name="emptydir">
+         <property name="text">
+          <string>&lt;directory&gt;</string>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="browsedir">
+         <property name="text">
+          <string>Browse...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QPushButton" name="pbSaveToProject">
+         <property name="text">
+          <string>Save directory to Project</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbSaveToGlobal">
+         <property name="text">
+          <string>Save directory to Global</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="label3_2">
+       <property name="text">
+        <string>Input Layer</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox_inputLayer"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label2">
+       <property name="text">
+        <string>COASTALME attribute type</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="emptyType">
+       <item>
+        <property name="text">
+         <string>0d_RL</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1d_bc</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1d_iwl</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1d_mh</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1d_nd</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1d_nwk</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1d_nwkb</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1d_nwke</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1d_pit</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1d_tab</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1d_WLL</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_bc</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_code</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_fc</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_fcsh</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_glo</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_gw</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_iwl</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_lfcsh</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_loc</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_lp</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_mat</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_oz</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_po</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_rf</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_sa</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_sa_rf</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_sa_tr</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_soil</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_vzsh</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_z__</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_zsh</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2d_zshr</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label3">
+       <property name="text">
+        <string>Run ID</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txtRunID">
+       <property name="text">
+        <string>&lt;RunID&gt;</string>
+       </property>
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Output Database (optional) - will convert to GPKG if specified for non-GPKG layers</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLineEdit" name="leDatabase">
+         <property name="text">
+          <string>&lt;Existing or New Database&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="browseDatabase">
+         <property name="text">
+          <string>Browse...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbOk">
+         <property name="text">
+          <string>OK</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbCancel">
+         <property name="text">
+          <string>Cancel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,9 @@
+location == COASTALME Control File (.tcf)
+
+command == Read GIS Cyclone
+
+description == Reads a cyclone or hurricane track. Requires both point and line geometry inputs. The line represents the track (no attribute data required) with points snapped to line vertices with attribute data representing the cyclone/hurricane properties at various points in time.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Control_file_.28TCF.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/Boundaries-InitialConditions-1.html#Cyclones-2

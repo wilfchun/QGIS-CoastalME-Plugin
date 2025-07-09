@@ -1,9 +1,0 @@
-location == Geometry Control File (.tgc)
-
-command == Read GIS Soil
-
-description == Used to define 2D soil type inputs for infiltration parameterisation
-
-wiki link == https://wiki.tuflow.com/TUFLOW_Empty_Files#TUFLOW_Geometry_Control_file_.28TGC.29
-
-manual link == https://docs.tuflow.com/classic-hpc/manual/2025.0/TwoD-Domains-1.html#tab:tab-SoilAttribute

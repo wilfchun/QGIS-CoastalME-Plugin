@@ -1,0 +1,9 @@
+location == COASTALME Control File (.tcf)
+
+command == Read GIS Auto Terminate
+
+description == Used to spatially define 2D cells for monitoring to trigger the auto terminate.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#ESTRY_Control_file_.28ECF.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/Running-Simulations-1.html#AutoTerminateOptions-3

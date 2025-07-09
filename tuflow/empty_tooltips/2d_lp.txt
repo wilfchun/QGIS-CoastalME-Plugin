@@ -1,9 +1,0 @@
-location == TUFLOW Control File (.tcf)
-
-command == Read GIS LP
-
-description == This file contains details on the location of longitudinal profile outputs.
-
-wiki link == https://wiki.tuflow.com/TUFLOW_Empty_Files#TUFLOW_Control_file_.28TCF.29
-
-manual link == https://docs.tuflow.com/classic-hpc/manual/2025.0/Outputs-1.html#LongProfile-4

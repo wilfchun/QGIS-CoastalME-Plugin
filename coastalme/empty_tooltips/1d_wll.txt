@@ -1,0 +1,9 @@
+location == ESTRY Control File (.ecf)
+
+command == Read GIS WLL
+
+description == Used to translate 1D results into 2D map output for viewing in SMS, WaterRide, Blue Kenu and GIS Software.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#ESTRY_Control_file_.28ECF.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/Outputs-1.html#WLL-4

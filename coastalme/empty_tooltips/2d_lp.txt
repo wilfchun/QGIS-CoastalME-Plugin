@@ -1,0 +1,9 @@
+location == COASTALME Control File (.tcf)
+
+command == Read GIS LP
+
+description == This file contains details on the location of longitudinal profile outputs.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Control_file_.28TCF.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/Outputs-1.html#LongProfile-4

@@ -1,0 +1,9 @@
+location == Geometry Control File (.tgc)
+
+command == Read GIS WRF
+
+description == Weir adjustment factor
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Geometry_Control_file_.28TGC.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/TwoD-Domains-1.html#HPC-US-Controlled-3

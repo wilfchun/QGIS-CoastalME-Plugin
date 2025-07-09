@@ -1,1 +1,0 @@
-This tool creates a SWMM GeoPackage file. The formatting works with the TUFLOW-SWMM tools for writing SWMM inp files. The file can be populated with an initial set of SWMM sections.

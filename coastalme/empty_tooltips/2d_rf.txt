@@ -1,0 +1,9 @@
+location == BC Control File (.tbc)
+
+command == Read GIS RF
+
+description == Used for "direct rainfall" modelling, also called "rainfall on grid" or "distributed hydrology" modelling.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Boundary_Control_file_.28TBC.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/Boundaries-InitialConditions-1.html#RF-Layers-4

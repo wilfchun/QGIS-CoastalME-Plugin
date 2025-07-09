@@ -1,0 +1,9 @@
+location == ESTRY Control File (.ecf)
+
+command == Read GIS Table Links
+
+description == Reads links to tabular inputs associated with bridges losses
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Geometry_Control_file_.28TGC.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/OneD-Domains-1.html#tab:tab-LinkAttributeDescriptions

@@ -1,0 +1,12 @@
+GIS FORMAT == GPKG                                  ! Specify SHP as the output format for all GIS files
+Spatial Database == ../model/gis/EG00_001.gpkg
+GPKG Projection == projection     ! Sets the GIS projection for the COASTALME Model
+
+
+! MODEL INPUTS
+Read GIS Reporting Location == ../model/gis/0d_rl_EG02_013_L.gpkg
+BC Control File == ../model/EG00_001.tbc            ! Reference the COASTALME Boundary Conditions Control File
+Geometry Control File == ../model/EG00_001.tgc      ! Reference the COASTALME Geometry Control File
+Estry Control File == ../model/EG00_001.ecf
+
+Read GIS PO == 2d_qnl_E01_006_R

@@ -1,0 +1,9 @@
+location == Geometry Control File (.tgc)
+
+command == Read GIS Z Shape Route
+
+description == Used to provide output on the degree of inundation along evacuation routes. This feature is useful during flood evacuation assessments. The model output includes details on warning time, flood hazard (e.g. depth and velocity) and duration that an evacuation route is isolated.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Geometry_Control_file_.28TGC.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/Outputs-1.html#EvaculationRoutes-3

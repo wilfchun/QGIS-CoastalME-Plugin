@@ -1,0 +1,9 @@
+location == Geometry Control File (.tgc)
+
+command == Read GIS IGW [ Depth | Level ]
+
+description == Ground water depth or level inputs.
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Geometry_Control_file_.28TGC.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/Boundaries-InitialConditions-1.html#IGW-3

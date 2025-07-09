@@ -1,0 +1,9 @@
+location == Quadtree Control File (.qcf)
+
+command == Read GIS Nesting
+
+description == Used to define polygons of mesh refinement (different levels).
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Quadtree_Control_File_.28QCF.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/TwoD-Domains-1.html#QDT-mesh-4

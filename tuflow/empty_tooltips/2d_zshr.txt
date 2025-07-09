@@ -1,9 +1,0 @@
-location == Geometry Control File (.tgc)
-
-command == Read GIS Z Shape Route
-
-description == Used to provide output on the degree of inundation along evacuation routes. This feature is useful during flood evacuation assessments. The model output includes details on warning time, flood hazard (e.g. depth and velocity) and duration that an evacuation route is isolated.
-
-wiki link == https://wiki.tuflow.com/TUFLOW_Empty_Files#TUFLOW_Geometry_Control_file_.28TGC.29
-
-manual link == https://docs.tuflow.com/classic-hpc/manual/2025.0/Outputs-1.html#EvaculationRoutes-3

@@ -1,0 +1,9 @@
+location == Geometry Control File (.tgc)
+
+command == Read GIS Objects
+
+description == Used to represent receptors (such as properties or buildings). COASTALME records the flood level and simulation time at one or more gauge(s) when receptors are first inundated above their trigger inundation levels (e.g. floor levels).
+
+wiki link == https://wiki.coastalme.com/COASTALME_Empty_Files#COASTALME_Geometry_Control_file_.28TGC.29
+
+manual link == https://docs.coastalme.com/classic-hpc/manual/2025.0/Outputs-1.html#Receptors-3

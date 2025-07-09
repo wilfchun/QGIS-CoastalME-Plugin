@@ -1,0 +1,3 @@
+Set Variable OUTPUT_FOLDER == Z:\COASTALME\31\35006\Yarra\YR_00065
+Event File == event_file.tef
+Output Folder == <<OUTPUT_FOLDER>>\1in0005
