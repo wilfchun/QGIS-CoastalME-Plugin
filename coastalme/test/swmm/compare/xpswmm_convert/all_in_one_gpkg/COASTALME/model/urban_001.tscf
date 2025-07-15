@@ -1,4 +1,0 @@
-Read SWMM == urban_001.inp
-
-Read GIS SWMM Inlet Usage == urban_iu_001.gpkg >> inlet_usage
-
