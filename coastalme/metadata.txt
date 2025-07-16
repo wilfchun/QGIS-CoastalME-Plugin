@@ -1,0 +1,40 @@
+# This file should be included when you package your plugin.
+
+# Mandatory items:
+
+
+[general]
+name=COASTALME
+qgisMinimumVersion=3.6
+qgisMaximumVersion=4.0
+supportsQt6=yes
+description=A collection of utilities for TUFLOW flood and coastal simulation in QGIS
+about=A collection of utilities for Coastalme coastal simulation in QGIS.
+      Includes visualisation of results / inputs
+      Editing tools
+      Styling tools
+version=0.1
+author=Wilf Chun
+email=wchun@moffattnichol.com
+
+# end of mandatory metadata
+
+# Optional items:
+
+# Uncomment the following line and add your changelog entries:
+changelog=
+          --- The changelog has been moved to the following URL ---
+
+# tags are comma separated with spaces allowed
+tags=COASTALME, simulation, MDAL, mesh, xmdf, dat, 2dm 
+
+homepage=https://www.osgeo.org/projects/coastalme/
+tracker=https://github.com/TUFLOW-Support/QGIS-TUFLOW-Plugin/issues
+repository=https://github.com/wilfchun/QGIS-CoastalME-Plugin
+icon=coastalme.png
+# experimental flag
+experimental=True
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+

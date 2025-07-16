@@ -1,0 +1,872 @@
+import os
+import re
+from datetime import datetime
+
+import numpy as np
+from qgis.PyQt.QtWidgets import QMessageBox
+from ..coastalmeqgis_library import (findPlotLayers, findIntersectFeat, is1dTable, is1dNetwork, isTSLayer, isPlotLayer)
+from ..COASTALME_XS import XS_results
+from .coastalmeqgis_cmeresultsindex import CmeResultsIndex
+from qgis.core import Qgis, QgsFeatureRequest, QgsExpression, QgsGeometry
+
+
+class CmePlot1D():
+	"""
+	Class for handling 1D specific plotting.
+	
+	"""
+	
+	def __init__(self, CmePlot):
+		self.cmePlot = CmePlot
+		self.cmeView = CmePlot.cmeView
+		self.cmeResults = CmePlot.cmeView.cmeResults
+	
+	def plot1dResults(self):
+		"""
+		Plot 1D results.
+
+		:return: bool -> True for successful, False for unsuccessful
+		"""
+
+		from .coastalmeqgis_cmeplot import CmePlot
+		
+		if self.cmeView.tabWidget.currentIndex() == CmePlot.TimeSeries:
+			self.plot1dTimeSeries()
+			self.plot1dMaximums()
+			self.plot1dMinimums()
+		elif self.cmeView.tabWidget.currentIndex() == CmePlot.CrossSection:
+			self.plot1dLongPlot()
+			self.plot1dCrossSection()
+			self.plot1dHydProperty()
+		
+		return True
+	
+	def plot1dHydProperty(self, **kwargs):
+		"""
+
+		"""
+
+		from .coastalmeqgis_cmeplot import CmePlot
+		cmeResults1D = self.cmeView.cmeResults.cmeResults1D  # CmeResults1D object
+
+		# deal with kwargs
+		bypass = kwargs['bypass'] if 'bypass' in kwargs.keys() else False  # bypass clearing any data from plot
+		plot = kwargs['plot'] if 'plot' in kwargs.keys() else ''
+		draw = kwargs['draw'] if 'draw' in kwargs.keys() else True
+		timestep = kwargs['time'] if 'time' in kwargs.keys() else None
+
+		i = 0
+		if self.cmeView.currentLayer is not None:
+			i = 1 if '.gpkg|layername=' in self.cmeView.currentLayer.dataProvider().dataSourceUri() else 0
+
+		if is1dTable(self.cmeView.currentLayer):
+			ids = [os.path.basename(x.attributes()[i].lower()) for x in self.cmeView.currentLayer.selectedFeatures()]
+		elif is1dNetwork(self.cmeView.currentLayer):
+			ids = [os.path.basename(x.attributes()[i].lower()) for x in self.cmeView.currentLayer.selectedFeatures()]
+		elif self.cmeView.currentLayer in findPlotLayers(geom='L'):
+			ids = [os.path.basename(x.attributes()[i].lower()) for x in self.cmeView.currentLayer.selectedFeatures()]
+		else:
+			ids = []
+
+		# clear the plot based on kwargs
+		if bypass:
+			pass
+		else:
+			self.cmePlot.clearPlot2(CmePlot.CrossSection, CmePlot.DataHydraulicProperty)
+
+		# initialise plot data
+		labels = []
+		types = []
+		xAll = []
+		yAll = []
+
+		for result in self.cmeView.OpenResults.selectedItems():
+			result = result.text()
+			if result in self.cmeResults.results.keys():
+				rtypes = cmeResults1D.typesXS[:]
+				for id in ids:
+					for rtype in rtypes:
+						if 'line_cs' in self.cmeResults.results[result] and \
+								rtype in self.cmeResults.results[result]['line_cs'] and \
+								id.lower() in [x.lower() for x in self.cmeResults.results[result]['line_cs'][rtype]]:
+							ta = self.cmeView.hydTables.getData(result)
+							if ta is None:
+								continue
+							x, y = ta.plotProperty(id, rtype)
+							xAll.append(x)
+							yAll.append(y)
+							labels.append('{0} - {1}'.format(id, rtype))
+							types.append('{0}_CS'.format(rtype))
+
+							# x, y, label, typ = self.plotResultsOnXS(xs, timestep)
+							# xAll += x
+							# yAll += y
+							# labels += label
+							# types += typ
+
+		data = list(zip(xAll, yAll))
+		dataTypes = [CmePlot.DataHydraulicProperty] * len(data)
+		if data:
+			self.cmePlot.drawPlot(CmePlot.CrossSection, data, labels, types, dataTypes, draw=draw)
+			self.cmePlot.profilePlotFirst = False
+
+	def plot1dCrossSection(self, **kwargs):
+		"""
+
+		"""
+
+		from .coastalmeqgis_cmeplot import CmePlot
+		cmeResults1D = self.cmeView.cmeResults.cmeResults1D  # CmeResults1D object
+
+		# deal with kwargs
+		bypass = kwargs['bypass'] if 'bypass' in kwargs.keys() else False  # bypass clearing any data from plot
+		plot = kwargs['plot'] if 'plot' in kwargs.keys() else ''
+		draw = kwargs['draw'] if 'draw' in kwargs.keys() else True
+		timestep = kwargs['time'] if 'time' in kwargs.keys() else None
+
+		if is1dTable(self.cmeView.currentLayer):
+			self.cmeView.loadXsSelections()
+
+		# clear the plot based on kwargs
+		if bypass:
+			pass
+		else:
+			self.cmePlot.clearPlot2(CmePlot.CrossSection, CmePlot.DataCrossSection1DViewer)
+
+		# initialise plot data
+		labels = []
+		types = []
+		xAll = []
+		yAll = []
+
+		for result in self.cmeView.OpenResults.selectedItems():
+			result = result.text()
+			if result in self.cmeResults.results.keys():
+				rtypes = cmeResults1D.typesXS[:]
+
+				crossSections = [self.cmeView.crossSections1D, self.cmeView.crossSectionsFM]
+
+				for crossSection in crossSections:
+					for xs in crossSection.data:
+						if xs.type.upper() in [x.upper() for x in rtypes]:
+							if 'line_cs' in self.cmeResults.results[result] and \
+									xs.type in self.cmeResults.results[result]['line_cs'] and \
+									xs.source.lower() in self.cmeResults.results[result]['line_cs'][xs.type]:
+								# xAll.append(xs.x)
+								# yAll.append(xs.z)
+								section = xs.crossSectionPlot(self.cmeView.cmeOptions.plotInactiveAreas)
+								if section.any():
+									xAll.append(section[:,0])
+									yAll.append(section[:,1])
+								else:
+									xAll.append([])
+									yAll.append([])
+								labels.append(xs.source)
+								types.append('{0}_CS'.format(xs.type))
+
+								x, y, label, typ = self.plotResultsOnXS(xs, timestep)
+								xAll += x
+								yAll += y
+								labels += label
+								types += typ
+
+		data = list(zip(xAll, yAll))
+		dataTypes = [CmePlot.DataCrossSection1DViewer] * len(data)
+		if data:
+			self.cmePlot.drawPlot(CmePlot.CrossSection, data, labels, types, dataTypes, draw=draw)
+			self.cmePlot.profilePlotFirst = False
+
+	def plotResultsOnXS(self, xs, timestep):
+		"""
+
+		"""
+
+		from .coastalmeqgis_cmeplot import CmePlot
+		cmeResults1D = self.cmeView.cmeResults.cmeResults1D  # CmeResults1D object
+
+		xAll, yAll = [], []
+		labels = []
+		typs = []
+		ids = []
+
+		plyrs = findPlotLayers('P')  # plot layers
+		if not plyrs:
+			return xAll, yAll, labels, typs
+
+		acceptedResults = ['level', 'water level', 'max water level']
+		rtypes = cmeResults1D.typesXSRes
+		rtypes = list(filter(lambda x: x.lower() in acceptedResults, rtypes))
+
+		for rtype in rtypes:
+			# get time
+			if '{0}_1d'.format(rtype) in self.cmeView.cmeResults.maxResultTypes:
+				rtypeLabel = '{0}/Maximums'.format(rtype)
+				time = -99999
+				isMax = True
+			elif rtype.lower() == 'max water level':  # has to go before block below otherwise isn't triggered correctly
+				time = -99999
+				isMax = True
+				rtypeLabel = rtype
+				rtype = 'level'
+			elif 'max' in rtype.lower():
+				time = -99999
+				rtypeLabel = rtype
+				isMax = True
+			elif rtype.lower() == 'water level':
+				if timestep is None:
+					timestep = self.cmeView.cmeResults.activeTime
+				rtypeLabel = rtype
+				isMax = False
+				rtype = 'level'
+			else:
+				if timestep is None:
+					timestep = self.cmeView.cmeResults.activeTime
+				# if timestep not in self.cmeView.cmeResults.timekey2time.keys():
+				# 	continue
+				# time = self.cmeView.cmeResults.timekey2time[timestep]
+				rtypeLabel = rtype
+				isMax = False
+
+			for plyr in plyrs:
+				feat = findIntersectFeat(xs.feacmere, plyr)
+				try:
+					if feat is None and xs.feacmere['provider'] == 'FM':
+						feat = [x for x in plyr.getFeatures(QgsFeatureRequest(QgsExpression(f'"ID" = \'{xs.source}\'')))][0]
+				except (KeyError, IndexError):
+					pass
+				if feat is None:
+					return xAll, yAll, labels, typs
+				id = feat.attributes()[0].strip()
+				#if id not in ids:
+				for result in self.cmeView.OpenResults.selectedItems():
+					result = result.text()
+					if result in self.cmeResults.cmeResults1D.results1d:
+						for res in self.cmeResults.cmeResults1D.results1d[result]:
+							# res = self.cmeResults.cmeResults1D.results1d[result]
+							if id in res.nodes.node_name:
+								if res.formatVersion > 1:
+
+									cmeResultsIndex = CmeResultsIndex(result, '{0}_1d'.format(rtype), timestep, isMax,
+																	False,
+																	self.cmeView.cmeResults,
+																	self.cmeView.cmeOptions.timeUnits)
+									time = cmeResultsIndex.timestep
+
+									h = res.getResAtTime(id, '1D', rtype, time)
+									if h is None or np.isnan(h):
+										continue
+									x, y = XS_results.fitResToXS2(xs, h)
+									label = '{0} - {1}'.format(id, rtypeLabel) if len(
+										self.cmeView.OpenResults.selectedItems()) < 2 \
+										else '{0} - {1} - {2}'.format(result, id, rtypeLabel)
+									xAll.append(x)
+									yAll.append(y)
+									labels.append(label)
+									typs.append(rtype)
+									ids.append(id)
+
+		return xAll, yAll, labels, typs
+
+	def plot1dTimeSeries(self, **kwargs):
+		"""
+		Plots 1D time series based on selected feacmeres, results, and result types.
+
+		:param kwargs: dict -> keyword arguments
+		:return: bool -> True for successful, False for unsuccessful
+		"""
+		from .coastalmeqgis_cmeplot import CmePlot
+
+		activeMeshLayers = self.cmeView.cmeResults.cmeResults2D.activeMeshLayers  # list
+		cmeResults1D = self.cmeView.cmeResults.cmeResults1D  # CmeResults1D object
+		
+		# deal with kwargs
+		bypass = kwargs['bypass'] if 'bypass' in kwargs.keys() else False  # bypass clearing any data from plot
+		plot = kwargs['plot'] if 'plot' in kwargs.keys() else ''
+		draw = kwargs['draw'] if 'draw' in kwargs.keys() else True
+		time = kwargs['time'] if 'time' in kwargs.keys() else None
+		showCurrentTime = kwargs['show_current_time'] if 'show_current_time' in kwargs.keys() else False
+		
+		# clear the plot based on kwargs
+		if bypass:
+			pass
+		else:
+			# if plot.lower() == '1d only':
+			# 	self.cmePlot.clearPlot(0)
+			# else:
+			# 	self.cmePlot.clearPlot(0, retain_2d=True, retain_flow=True)
+			self.cmePlot.clearPlot2(CmePlot.TimeSeries, CmePlot.DataTimeSeries1D)
+		
+		labels = []
+		types = []
+		xAll = []
+		yAll = []
+		plotAsPoints = []  # 2019 for flow regime
+		flowRegime = []  # 2019
+		flowRegimeTied = []  # 2020 flow regime tied to specific result type
+		
+		# iterate through all selected results
+		#results = [x.text() for x in self.cmeView.OpenResults.selectedItems()]
+		#for result in results:
+
+		for result in self.cmeView.OpenResults.selectedItems():
+			result = result.text()
+			#result = result.name()
+
+			is_plot_lyr = isPlotLayer(self.cmeView.currentLayer)
+			is_ts_lyr = re.findall(r'_TS(MB|MB1d2d)?(_[PLR])?$', result, flags=re.IGNORECASE) and isTSLayer(
+				self.cmeView.currentLayer) and not is_plot_lyr
+			is_ts_lyr_like = re.findall(r'_TS(MB|MB1d2d)?(_[PLR])?$', result, flags=re.IGNORECASE) and not is_plot_lyr
+
+			if result in cmeResults1D.results1d.keys():
+				for res in cmeResults1D.results1d[result]:
+					# get result types for all selected types
+					if is_ts_lyr:
+						i = 1 if self.cmeView.currentLayer.storageType() == 'GPKG' else 0
+						rtypes = [f.attribute(i)[0] for f in self.cmeView.currentLayer.selectedFeatures()]
+					elif is_ts_lyr_like:
+						continue
+					else:
+						rtypes = cmeResults1D.typesTS[:]
+					#for rtype in cmeResults1D.typesTS:
+					for rtype in rtypes:
+						# get result for each selected element
+						for i, id in enumerate(cmeResults1D.ids):
+							#types.append('{0}_1d'.format(rtype))
+							if rtype.lower() == "flow regime":
+								plotAsPoints.append(True)
+								flowRegime.append(True)
+								types.append('{0}_1d'.format(rtype))
+								flowRegimeTied.append(-1)
+							elif re.findall(r"flow regime_\d", rtype, flags=re.IGNORECASE):
+								f_id = re.split(r".*_\d_", rtype, flags=re.IGNORECASE)[1]
+								if f_id == id:
+									plotAsPoints.append(True)
+									flowRegime.append(True)
+									types.append('{0}_1d'.format(rtype))
+									flowRegimeTied.append(int(re.findall(r"\d", rtype)[0]))
+								else:
+									continue
+							elif rtype.lower() == "losses":
+								if id not in res.Data_1D.CL.uID:
+									continue
+								iun = res.Data_1D.CL.uID.index(id)  # index unique name
+								nCol = res.Data_1D.CL.nCols[iun]  # number of columns associated with element losses
+								for j in range(nCol):
+									plotAsPoints.append(False)
+									flowRegime.append(False)
+									types.append('{0}_1d'.format(rtype))
+									flowRegimeTied.append(-1)
+							else:
+								plotAsPoints.append(False)
+								flowRegime.append(False)
+								types.append('{0}_1d'.format(rtype))
+								flowRegimeTied.append(-1)
+
+							# get data
+							if res.formatVersion == 1:  # 2013
+								found, ydata, message = res.getTSData(id, rtype)
+								xdata = res.times
+							elif res.formatVersion == 2:  # 2015
+								dom = cmeResults1D.domains[i]
+								source = cmeResults1D.sources[i].upper()
+								if dom == '2D':
+									if rtype.upper().find('STRUCTURE FLOWS') >= 0 and 'QS' in source:
+										typename = 'QS'
+									elif rtype.upper().find('STRUCTURE LEVELS') >= 0 and 'HU' in source:
+										typename = 'HU'
+									elif rtype.upper().find('STRUCTURE LEVELS') >= 0 and 'HD' in source:
+										typename = 'HD'
+									else:
+										typename = rtype
+								else:
+									if re.findall("flow regime", rtype, re.IGNORECASE):
+										typename = "Flow Regime"
+									else:
+										typename = rtype
+								found, ydata, message = res.getTSData(id, dom, typename, 'Geom')
+								xdata = res.times if found else []
+							elif res.formatVersion == 0:  # _TS
+								xdata, ydata = res.getTSData(self.cmeView.currentLayer, id)
+								rtype = ''
+							else:
+								continue
+							if type(ydata) is list:
+								if len(xdata) != len(ydata):
+									xAll.append([])
+									yAll.append([])
+									labels.append('')
+									continue
+							else:  # ndarray
+								if len(xdata) != ydata.shape[0]:
+									xAll.append([])
+									yAll.append([])
+									labels.append('')
+									continue
+							if rtype != "Losses":
+								if re.findall(r"flow regime", rtype, re.IGNORECASE):
+									rtypelab = "Flow Regime_"
+									label = '{0} - {1}'.format(id, rtypelab) if len(
+										self.cmeView.OpenResults.selectedItems()) < 2 \
+										else '{0} - {1} - {2}'.format(result, id, rtypelab)
+								else:
+									if rtype:
+										label = '{0} - {1}'.format(id, rtype) if len(self.cmeView.OpenResults.selectedItems()) < 2 \
+											else '{0} - {1} - {2}'.format(result, id, rtype)
+									else:
+										label = id
+								xy = np.array(list(zip(xdata, ydata)))
+								if xy.dtype == np.float64 and xy.any():
+									xy = xy[~np.isnan(xy).any(axis=1)]
+									xdata = xy[:, 0]
+									ydata = xy[:, 1]
+								xAll.append(xdata)
+								yAll.append(ydata)
+								labels.append(label)
+							else:
+								for i in range(ydata.shape[1]):
+									xAll.append(xdata)
+									yAll.append(ydata[:,i])
+									j = res.Data_1D.CL.ID.index(id)
+									lossName = res.Data_1D.CL.lossNames[j+i].strip()
+									label = '{0} - {1} LC'.format(id, lossName) if len(self.cmeView.OpenResults.selectedItems()) < 2 \
+										else "{0} - {1} - {2} LC".format(result, id, lossName)
+									labels.append(label)
+									#if i > 0:
+									#	types.append('{0}_1d'.format(rtype))
+									#	plotAsPoints.append(False)
+									#	flowRegime.append(False)
+
+							tsResultTypes = [x for x in self.cmeView.OpenResultTypes.model().timeSeriesItem.children()]
+							if rtype.lower() in [x.ds_name.lower() for x in tsResultTypes]:
+								irtype = [x.ds_name.lower() for x in tsResultTypes].index(rtype.lower())
+								if tsResultTypes[irtype].isFlowRegime:
+									rtypes.append('Flow Regime_{0}_{1}'.format(len(xAll) - 1, id))
+		data = list(zip(xAll, yAll))
+		dataTypes = [CmePlot.DataTimeSeries1D] * len(data)
+		if data:
+			self.cmePlot.drawPlot(CmePlot.TimeSeries, data, labels, types, dataTypes,
+			                     draw=draw, time=time, show_current_time=showCurrentTime,
+			                     plot_as_points=plotAsPoints, flow_regime=flowRegime, flow_regime_tied=flowRegimeTied)
+		
+		return True
+	
+	def plot1dLongPlot(self, **kwargs):
+		"""
+		Plots 1D long plots based on selected feacmeres, results, and result types.
+
+		:param kwargs: dict -> keyword arguments
+		:return: bool -> True for successful, False for unsuccessful
+		"""
+		t = datetime.now()
+		from .coastalmeqgis_cmeplot import CmePlot
+
+		qv = Qgis.QGIS_VERSION_INT
+
+		activeMeshLayers = self.cmeView.cmeResults.cmeResults2D.activeMeshLayers  # list
+		cmeResults1D = self.cmeView.cmeResults.cmeResults1D  # CmeResults1D object
+		
+		# deal with kwargs
+		bypass = kwargs['bypass'] if 'bypass' in kwargs.keys() else False  # bypass clearing any data from plot
+		plot = kwargs['plot'] if 'plot' in kwargs.keys() else ''
+		draw = kwargs['draw'] if 'draw' in kwargs.keys() else True
+		timestep = kwargs['time'] if 'time' in kwargs.keys() else None
+		
+		# clear the plot based on kwargs
+		if bypass:
+			pass
+		else:
+			#if plot.lower() == '1d only':
+			#	self.cmePlot.clearPlot(1)
+			#else:
+			#	self.cmePlot.clearPlot(1, retain_2d=True)
+			self.cmePlot.clearPlot2(CmePlot.CrossSection, CmePlot.DataCrossSection1D)
+
+		# long plots that don't fit into long plot pipe data
+		self.time_series_profile(timestep, draw)
+		
+		labels = []
+		xAll = []
+		yAll = []
+		types = []
+		plotAsPoints = []
+		plotAsPatch = []
+		dataTypes = []
+		pipeNames = []
+		chanNames = {}
+
+		# iterate through all selected results
+		geom = None
+		for result in self.cmeView.OpenResults.selectedItems():
+			result = result.text()
+
+			if result in cmeResults1D.results1d.keys():
+				for res in cmeResults1D.results1d[result]:
+					if res.supports_new_profile_plot:
+						continue  # already plotted
+					t_ = datetime.now()
+					error = cmeResults1D.getLongPlotConnectivity(res)
+					print('getLongPlotConnectivity', (datetime.now() - t_).total_seconds())
+					if not error:
+
+						# get result types for all selected types
+						for type in cmeResults1D.typesLP:
+							types.append('{0}_1d'.format(type))
+
+							if qv < 31600:
+								if '{0}_1d'.format(type) in self.cmeView.cmeResults.maxResultTypes:
+									type = '{0}/Maximums'.format(type)
+									time = 99999
+								if 'max' in type.lower():
+									time = -99999
+								else:
+									if timestep is None:
+										timestep = self.cmeView.cmeResults.activeTime
+									if timestep not in self.cmeView.cmeResults.timekey2time.keys():
+										xAll.append([])
+										yAll.append([])
+										labels.append('')
+										plotAsPatch.append(False)
+										plotAsPoints.append(False)
+										continue
+									time = self.cmeView.cmeResults.timekey2time[timestep]
+							else:
+								if timestep is None:
+									timestep = self.cmeView.cmeResults.activeTime
+								isMin = False
+								isMax = False
+								if '{0}_1d'.format(type) in self.cmeView.cmeResults.maxResultTypes:
+									isMax = True
+								elif 'max' in type.lower():
+									isMax = True
+								cmeResultsIndex = CmeResultsIndex(result, '{0}_1d'.format(type), timestep, isMax, isMin,
+																self.cmeView.cmeResults, self.cmeView.cmeOptions.timeUnits)
+								time = cmeResultsIndex.timestep
+								if time is None:
+									xAll.append([])
+									yAll.append([])
+									labels.append('')
+									plotAsPatch.append(False)
+									plotAsPoints.append(False)
+									continue
+
+							x, y = res.getLongPlotXY(type, time)
+							geom = res.getGeometry()
+							if isinstance(geom, bytes):
+								g = QgsGeometry()
+								g.fromWkb(geom)
+								geom = g
+
+							if x is not None and y is not None:
+								# treat differently if adverse gradients
+								if 'adverse gradients (if any)' in type.lower():
+									#if x[0]:
+									xAll.append(x[0])
+									yAll.append(x[1])
+									label = 'Adverse Water Level Gradient' \
+										if len(self.cmeView.OpenResults.selectedItems()) < 2 \
+										else '{0} - Adverse Water Level Gradient'.format(result)
+									labels.append(label)
+									plotAsPoints.append(True)
+									plotAsPatch.append(False)
+									#if y[0]:
+									xAll.append(y[0])
+									yAll.append(y[1])
+									label = 'Adverse Energy Level Gradient' \
+										if len(self.cmeView.OpenResults.selectedItems()) < 2 \
+										else '{0} - Adverse Energy Level Gradient'.format(result)
+									labels.append(label)
+									plotAsPoints.append(True)
+									plotAsPatch.append(False)
+								# treat differently if culverts and pipes
+								elif 'culverts and pipes' in type.lower():
+									if x:
+										xAll.append(x)
+										yAll.append(y)
+										label = 'Culverts and Pipes' \
+											if len(self.cmeView.OpenResults.selectedItems()) < 2 \
+											else '{0} - Culverts and Pipes'.format(result)
+										labels.append(label)
+										plotAsPoints.append(False)
+										plotAsPatch.append(True)
+										# pipeNames.append(res.LP.chan_ids[:])
+										pipeNames.append(res.LP.chan_list[:])
+								# else normal X, Y data
+								else:
+									if len(x) != len(y):
+										xAll.append([])
+										yAll.append([])
+										labels.append('')
+										continue
+									xAll.append(x)
+									yAll.append(y)
+									if type == 'Water Level' or type == 'Bed Elevation':  # add 1D to label if name also in 2D results
+										label = '{0} 1D'.format(type) if len(
+											self.cmeView.OpenResults.selectedItems()) < 2 else '{0} - {1} 1D'.format(
+											result, type)
+									else:
+										label = '{0}'.format(type) if len(
+											self.cmeView.OpenResults.selectedItems()) < 2 else '{0} - {1}'.format(
+											result, type)
+									labels.append(label)
+									if 'pit ground levels' in type.lower():
+										plotAsPoints.append(True)
+									else:
+										plotAsPoints.append(False)
+									plotAsPatch.append(False)
+									if type == 'Bed Level':
+										chanNames[label] = res.LP.chan_list[:]
+		
+		data = list(zip(xAll, yAll))
+		dataTypes = [CmePlot.DataCrossSection1D] * len(data)
+		if data:
+			self.cmePlot.drawPlot(CmePlot.CrossSection, data, labels, types, dataTypes,
+			                     plot_as_points=plotAsPoints, plot_as_patch=plotAsPatch, draw=draw,
+			                     pipe_names=pipeNames, chan_names=chanNames, geom=geom)
+			self.cmePlot.profilePlotFirst = False
+		print('plot1dLongPlot', (datetime.now() - t).total_seconds())
+		return True
+
+	def time_series_profile(self, timestep, draw):
+		if not self.cmeResults.cmeResults1D.typesLP:
+			return
+
+		results = [self.cmeResults.cmeResults1D.results1d[x.text()] for x in self.cmeView.OpenResults.selectedItems() if x.text() in self.cmeResults.cmeResults1D.results1d]
+		results = [x for x in sum(results, []) if x.supports_new_profile_plot]
+		if not results:
+			return
+
+		ids, _, _ = self.cmeResults.cmeResults1D.getIDList()
+		if not ids:
+			return
+
+		if timestep is None:
+			timestep = self.cmeView.cmeResults.activeTime
+
+		for id_ in ids:
+			geom = None
+			xAll = []
+			yAll = []
+			labels = []
+			types = []
+			for res in results:
+				if not res.supports_new_profile_plot:
+					continue
+				if id_ not in res.ids():
+					continue
+				for rtyp in self.cmeResults.cmeResults1D.typesLP:
+					x, y = res.getTimeSeriesProfile(id_, rtyp, timestep)
+					if x is None or y is None:
+						continue
+					xAll.append(x)
+					yAll.append(y)
+					geom = res.getGeometry(id_)
+					if isinstance(geom, bytes):
+						g = QgsGeometry()
+						g.fromWkb(geom)
+						geom = g
+					labels.append('{0} - {1} - {2}'.format(res.displayname, id_, rtyp))
+					types.append(f'{rtyp}_1d')
+
+			data = list(zip(xAll, yAll))
+			dataTypes = [self.cmeView.cmePlot.DataCrossSection1D] * len(data)
+			if data:
+				self.cmePlot.drawPlot(self.cmeView.cmePlot.CrossSection, data, labels, types, dataTypes, draw=draw, geom=geom)
+				self.cmePlot.profilePlotFirst = False
+
+	def plot1dMaximums(self, **kwargs):
+		"""
+		Plots 1D maximums based on selected feacmeres, results, and result types.
+
+		:param kwargs: dict -> keyword arguments
+		:return: bool -> True for successful, False for unsuccessful
+		"""
+
+		from .coastalmeqgis_cmeplot import CmePlot
+
+		activeMeshLayers = self.cmeView.cmeResults.cmeResults2D.activeMeshLayers  # list
+		cmeResults1D = self.cmeView.cmeResults.cmeResults1D  # CmeResults1D object
+
+		# deal with kwargs
+		bypass = kwargs['bypass'] if 'bypass' in kwargs.keys() else False  # bypass clearing any data from plot
+		bypass = True
+		plot = kwargs['plot'] if 'plot' in kwargs.keys() else ''
+		draw = kwargs['draw'] if 'draw' in kwargs.keys() else True
+
+		# clear the plot based on kwargs
+		if bypass:
+			pass
+		else:
+			if plot.lower() == '1d only':
+				self.cmePlot.clearPlot(0)
+			else:
+				self.cmePlot.clearPlot(0, retain_2d=True, retain_flow=True)
+
+		labels = []
+		types = []
+		xAll = []
+		yAll = []
+		plotAsPoints = []
+		dataTypes = []
+
+		# iterate through all selected results
+		for result in self.cmeView.OpenResults.selectedItems():
+			# for result in self.cmeView.cmeResults.cmeResults2D.activeMeshLayers:
+			result = result.text()
+			# result = result.name()
+
+			if result in cmeResults1D.results1d.keys():
+				for res in cmeResults1D.results1d[result]:
+					# get result types for all selected types
+					if re.findall(r'_TS(_[PLR])?$', result, flags=re.IGNORECASE) and isTSLayer(self.cmeView.currentLayer):
+						i = 1 if '.gpkg|layername=' in self.cmeView.currentLayer.dataProvider().dataSourceUri().lower() else 0
+						rtypes = [f.attribute(i)[0] for f in self.cmeView.currentLayer.selectedFeatures()]
+					else:
+						rtypes = cmeResults1D.typesTS[:]
+
+					# get result types for all selected types
+					for type in rtypes:
+
+						if '{0}_1d'.format(type) in self.cmeResults.maxResultTypes or isTSLayer(result, self.cmeResults.results):
+
+							# get result for each selected element
+							for i, id in enumerate(cmeResults1D.ids):
+								types.append('{0}_1d'.format(type))
+
+								# get data
+								if res.formatVersion == 1:  # 2013
+									found, ydata, message = res.getMAXData(id, type)
+									xdata = res.times
+								elif res.formatVersion == 2:  # 2015
+									dom = cmeResults1D.domains[i]
+									source = cmeResults1D.sources[i].upper()
+									typename = type
+									found, xydata, message = res.getMAXData(id, dom, typename)
+									if len(xydata) != 2:
+										xAll.append([])
+										yAll.append([])
+										labels.append('')
+										plotAsPoints.append(True)
+										continue
+									xdata = [xydata[0]]
+									ydata = [xydata[1]]
+								elif res.formatVersion == 0:  # _TS
+									xdata, ydata = res.getMaxData(self.cmeView.currentLayer, id)
+									type = ''
+								else:
+									continue
+								if type:
+									label = '{0} - {1} Max'.format(id, type) if len(self.cmeView.OpenResults.selectedItems()) < 2 \
+										else '{0} - {1} - {2} Max'.format(result, id, type)
+								else:
+									label = '{0} - Max'.format(id)
+								xAll.append(xdata)
+								yAll.append(ydata)
+								labels.append(label)
+								plotAsPoints.append(True)
+
+		data = list(zip(xAll, yAll))
+		dataTypes = [CmePlot.DataTimeSeries1D] * len(data)
+		if data:
+			self.cmePlot.drawPlot(CmePlot.TimeSeries, data, labels, types, dataTypes, plot_as_points=plotAsPoints, draw=draw)
+
+		return True
+
+	def plot1dMinimums(self, **kwargs):
+		"""
+		Plots 1D maximums based on selected feacmeres, results, and result types.
+
+		:param kwargs: dict -> keyword arguments
+		:return: bool -> True for successful, False for unsuccessful
+		"""
+
+		from .coastalmeqgis_cmeplot import CmePlot
+
+		activeMeshLayers = self.cmeView.cmeResults.cmeResults2D.activeMeshLayers  # list
+		cmeResults1D = self.cmeView.cmeResults.cmeResults1D  # CmeResults1D object
+
+		# deal with kwargs
+		bypass = kwargs['bypass'] if 'bypass' in kwargs.keys() else False  # bypass clearing any data from plot
+		bypass = True
+		plot = kwargs['plot'] if 'plot' in kwargs.keys() else ''
+		draw = kwargs['draw'] if 'draw' in kwargs.keys() else True
+
+		# clear the plot based on kwargs
+		if bypass:
+			pass
+		else:
+			if plot.lower() == '1d only':
+				self.cmePlot.clearPlot(0)
+			else:
+				self.cmePlot.clearPlot(0, retain_2d=True, retain_flow=True)
+
+		labels = []
+		types = []
+		xAll = []
+		yAll = []
+		plotAsPoints = []
+		dataTypes = []
+
+		# iterate through all selected results
+		for result in self.cmeView.OpenResults.selectedItems():
+			# for result in self.cmeView.cmeResults.cmeResults2D.activeMeshLayers:
+			result = result.text()
+			# result = result.name()
+
+			if result in cmeResults1D.results1d.keys():
+				for res in cmeResults1D.results1d[result]:
+					# get result types for all selected types
+					if re.findall(r'_TS(_[PLR])?$', result, flags=re.IGNORECASE) and isTSLayer(self.cmeView.currentLayer):
+						i = 1 if '.gpkg|layername=' in self.cmeView.currentLayer.dataProvider().dataSourceUri().lower() else 0
+						rtypes = [f.attribute(i)[0] for f in self.cmeView.currentLayer.selectedFeatures()]
+					else:
+						rtypes = cmeResults1D.typesTS[:]
+
+					# get result types for all selected types
+					for type in rtypes:
+
+						if '{0}_1d'.format(type) in self.cmeResults.minResultTypes or isTSLayer(result, self.cmeResults.results):
+
+							# get result for each selected element
+							for i, id in enumerate(cmeResults1D.ids):
+								types.append('{0}_1d'.format(type))
+
+								# get data
+								if res.formatVersion == 1:  # 2013
+									# found, ydata, message = res.getMAXData(id, type)
+									# xdata = res.times
+									continue
+								elif res.formatVersion == 2:  # 2015
+									# dom = cmeResults1D.domains[i]
+									# source = cmeResults1D.sources[i].upper()
+									# typename = type
+									# found, xydata, message = res.getMAXData(id, dom, typename)
+									# if len(xydata) != 2:
+									# 	xAll.append([])
+									# 	yAll.append([])
+									# 	labels.append('')
+									# 	plotAsPoints.append(True)
+									# 	continue
+									# xdata = [xydata[0]]
+									# ydata = [xydata[1]]
+									continue
+								elif res.formatVersion == 0:  # _TS
+									xdata, ydata = res.getMinData(self.cmeView.currentLayer, id)
+									type = ''
+								else:
+									continue
+								if type:
+									label = '{0} - {1} Min'.format(id, type) if len(self.cmeView.OpenResults.selectedItems()) < 2 \
+										else '{0} - {1} - {2} Min'.format(result, id, type)
+								else:
+									label = '{0} - Min'.format(id)
+								xAll.append(xdata)
+								yAll.append(ydata)
+								labels.append(label)
+								plotAsPoints.append(True)
+
+		data = list(zip(xAll, yAll))
+		dataTypes = [CmePlot.DataTimeSeries1D] * len(data)
+		if data:
+			self.cmePlot.drawPlot(CmePlot.TimeSeries, data, labels, types, dataTypes, plot_as_points=plotAsPoints, draw=draw)
+
+		return True
