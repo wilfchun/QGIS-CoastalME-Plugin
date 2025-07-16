@@ -7,7 +7,7 @@ The QGIS-CoastalME plugin is a collection of tools to assist with the building a
 ### Repository Contents:
 
 - Readme.md - You're here
-- /qgis_plugin/tuflow - contains the main core of the plugin.
+- /qgis_plugin/coastalme - contains the main core of the plugin.
 
 - /utilities/ - location for functionality / libraries that can be re-used elsewhere (e.g. a python lib that's also a script).
 
@@ -22,7 +22,7 @@ The QGIS-CoastalME plugin is a collection of tools to assist with the building a
 
 The tuflow folder from QGIS-CoastalME-Plugin-master.zip\QGIS-CoastalME-Plugin-master\qgis_plugin\tuflow should sit directly plugin folder i.e.
 
-	C:\Users\<username>\.qgis2\python\plugins\tuflow\
+	QGIS/profiles/default/python/plugins
 
 
 Alternatively you can clone the repository from github, although you will need to unpack into the directory structure above.
@@ -33,11 +33,7 @@ Alternatively you can clone the repository from github, although you will need t
 
 	Plugins >> CoastalME
 
-  To check you have the required dependencies please run the following tool:
-
-    Plugins >> CoastalME >> About >> Check Python Dependencies Installed.
-
-  If additional dependencies are required, these should be listed in the dialogue.  The main dependencies are:
+  The main dependencies are:
 
 - matplotlib
 
@@ -48,3 +44,6 @@ Alternatively you can clone the repository from github, although you will need t
   You can download numpy from [here](http://sourceforge.net/projects/numpy/files/NumPy/1.6.1/numpy-1.6.1-win32-superpack-python2.7.exe/download) and install it in the usual way.
 
   Alternatively, you can install them from OSGeo4W package manager.
+
+- CoastalmeTools
+You can download coastalmetools from [here](https://github.com/wilfchun/CoastalmeTools) and install it in the usual way.
