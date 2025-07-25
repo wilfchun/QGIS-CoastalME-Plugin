@@ -25,6 +25,7 @@
 # from qgis.PyQt.QtWidgets  import ( QMenu )
 
 # Import the code for the library functions
+import importlib
 from .coastalmeqgis_library import about, resetQgisSettings
 
 # Import the code for the COASTALME viewer
@@ -50,6 +51,8 @@ from .compatibility_routines import (
     QT_DOCK_WIDGET_AREA_BOTTOM,
     QT_DOCK_WIDGET_AREA_RIGHT,
 )
+    
+import subprocess
 
 
 class coastalmeqgis_menu:
@@ -123,11 +126,11 @@ class coastalmeqgis_menu:
         self.reloadCmeviewAction.triggered.connect(self.reloadCmeview)
 
         # Reload Data - Toolbar button
-        icon = QIcon(os.path.join(dir, "icons", "Reload_Data.PNG"))
-        self.reload_data_action = QAction(icon, "Reload Data", self.iface.mainWindow())
-        self.reload_data_action.triggered.connect(self.reload_data)
-        self.iface.addToolBarIcon(self.reload_data_action)
-        self.coastalmeMenu.addAction(self.reload_data_action)
+        icon = QIcon(os.path.join(dir, "icons", "refreshplotblack.png"))
+        self.setup_action = QAction(icon, "Set-up plugin", self.iface.mainWindow())
+        self.setup_action.triggered.connect(self.setup_plugin)
+        self.iface.addToolBarIcon(self.setup_action)
+        self.coastalmeMenu.addAction(self.setup_action)
 
         # COASTALME Viewer - Toolbar button
         icon = QIcon(os.path.join(dir, "icons", "coastalme.png"))
@@ -138,7 +141,33 @@ class coastalmeqgis_menu:
         self.iface.addToolBarIcon(self.view_results_action)
         self.coastalmeMenu.addAction(self.view_results_action)
 
-        # Removed all other toolbar icons and menu items - keeping only essential functionality
+        # Reload Data - Toolbar button
+        icon = QIcon(os.path.join(dir, "icons", "Reload_Data.PNG"))
+        self.reload_data_action = QAction(icon, "Reload Data", self.iface.mainWindow())
+        self.reload_data_action.triggered.connect(self.reload_data)
+        self.iface.addToolBarIcon(self.reload_data_action)
+        self.coastalmeMenu.addAction(self.reload_data_action)
+
+        # Load Data - Toolbar button
+        icon = QIcon(os.path.join(dir, "icons", "cme_import.png"))
+        self.load_data_action = QAction(icon, "Load Data", self.iface.mainWindow())
+        self.load_data_action.triggered.connect(self.load_data)
+        self.iface.addToolBarIcon(self.load_data_action)
+        self.coastalmeMenu.addAction(self.load_data_action)
+
+        # proccess cme
+        icon = QIcon(os.path.join(dir, "icons", "Run_TUFLOW.png"))
+        self.process_cme_out_action = QAction(icon, "Proccess Output", self.iface.mainWindow())
+        self.process_cme_out_action.triggered.connect(self.process_cme_out)
+        self.iface.addToolBarIcon(self.process_cme_out_action)
+        self.coastalmeMenu.addAction(self.process_cme_out_action)
+
+        # proccess cme
+        icon = QIcon(os.path.join(dir, "icons", "play_button.png"))
+        self.run_cme_action = QAction(icon, "Run CoastalMe", self.iface.mainWindow())
+        self.run_cme_action.triggered.connect(self.run_cme)
+        self.iface.addToolBarIcon(self.run_cme_action)
+        self.coastalmeMenu.addAction(self.run_cme_action)
 
     def unload(self):
         # coastalme viewer
@@ -152,6 +181,10 @@ class coastalmeqgis_menu:
         # Remove only the toolbar icons we're keeping
         self.iface.removeToolBarIcon(self.reload_data_action)
         self.iface.removeToolBarIcon(self.view_results_action)
+        self.iface.removeToolBarIcon(self.process_cme_out_action)
+        self.iface.removeToolBarIcon(self.load_data_action)
+        self.iface.removeToolBarIcon(self.setup_action)
+        self.iface.removeToolBarIcon(self.run_cme_action)
 
     def about_coastalmeqgis(self):
         about(self.iface.mainWindow())
@@ -207,14 +240,18 @@ class coastalmeqgis_menu:
                             dockArea = int(dockArea)
                         except ValueError:
                             dockArea = QT_DOCK_WIDGET_AREA_RIGHT
-                isTabified = QSettings().value("COASTALME/cmeview_isdocktabified", False)
+                isTabified = QSettings().value(
+                    "COASTALME/cmeview_isdocktabified", False
+                )
                 if type(isTabified) is str:
                     try:
                         isTabified = bool(isTabified)
                     except ValueError:
                         isTabified = False
                 if isTabified:
-                    tabifiedWith = QSettings().value("COASTALME/cmeview_tabifiedwith", [])
+                    tabifiedWith = QSettings().value(
+                        "COASTALME/cmeview_tabifiedwith", []
+                    )
                     if type(isTabified) is str:
                         tabifiedWith = tabifiedWith.split(",")
                     if not tabifiedWith:
@@ -243,7 +280,9 @@ class coastalmeqgis_menu:
                     return
             if not no_popup:
                 QMessageBox.information(
-                    self.iface.mainWindow(), "COASTALME", "Completely Closed COASTALME Viewer"
+                    self.iface.mainWindow(),
+                    "COASTALME",
+                    "Completely Closed COASTALME Viewer",
                 )
         except:
             if "feedback" in kwargs:
@@ -301,7 +340,9 @@ class coastalmeqgis_menu:
             )
             return
         dir = os.path.dirname(__file__)
-        script_with_path = os.path.join(dir, "runner\\coastalme-runner\\runner\\main.py")
+        script_with_path = os.path.join(
+            dir, "runner\\coastalme-runner\\runner\\main.py"
+        )
         if not os.path.isfile(script_with_path):
             QMessageBox.critical(
                 self.iface.mainWindow(),
@@ -345,107 +386,6 @@ class coastalmeqgis_menu:
         dialog = coastalmeqgis_import_check_dialog(self.iface, project)
         dialog.exec()
 
-    # All other methods removed - keeping only essential functionality
-
-    def openResultsPlottingWindow(self, showmessage=True):
-        qv = Qgis.QGIS_VERSION_INT
-        if self.resultsPlottingDockOpened:
-            if not self.resultsPlottingDock.isVisible():
-                self.resultsPlottingDock.show()
-                self.resultsPlottingDock.qgisConnect()
-            elif showmessage:
-                bRedock = QMessageBox.question(
-                    self.iface.mainWindow(),
-                    "COASTALME Viewer",
-                    "Would you like to redock COASTALME Viewer?",
-                    QT_MESSAGE_BOX_YES | QT_MESSAGE_BOX_NO | QT_MESSAGE_BOX_CANCEL,
-                )
-                if bRedock == QT_MESSAGE_BOX_YES:
-                    self.resultsPlottingDock.setFloating(False)
-        else:
-            try:
-                self.resultsPlottingDock = CmeView(
-                    self.iface,
-                    removeCmeview=self.removeCmeviewAction,
-                    reloadCmeview=self.reloadCmeviewAction,
-                )
-            except:
-                self.resultsPlottingDock = CmeView(self.iface)
-            dockArea = QT_DOCK_WIDGET_AREA_BOTTOM
-            isTabified = False
-            tabifiedWith = []
-            if QSettings().value(
-                "COASTALME/cmeview_defaultlayout", "previous_state"
-            ) == "narrow" or (
-                QSettings().value("COASTALME/cmeview_defaultlayout", "previous_state")
-                == "previous_state"
-                and QSettings().value("COASTALME/cmeview_previouslayout", "plot")
-                == "narrow"
-            ):
-                dockArea = QT_DOCK_WIDGET_AREA_RIGHT
-                if QSettings().contains("COASTALME/cmeview_docklocation"):
-                    dockArea = QSettings().value(
-                        "COASTALME/cmeview_docklocation", QT_DOCK_WIDGET_AREA_RIGHT
-                    )
-                    if type(dockArea) is str:
-                        try:
-                            dockArea = int(dockArea)
-                        except ValueError:
-                            dockArea = QT_DOCK_WIDGET_AREA_RIGHT
-                isTabified = QSettings().value("COASTALME/cmeview_isdocktabified", False)
-                if type(isTabified) is str:
-                    try:
-                        isTabified = bool(isTabified)
-                    except ValueError:
-                        isTabified = False
-                if isTabified:
-                    tabifiedWith = QSettings().value("COASTALME/cmeview_tabifiedwith", [])
-                    if type(isTabified) is str:
-                        tabifiedWith = tabifiedWith.split(",")
-                    if not tabifiedWith:
-                        isTabified = False
-
-            if isTabified and qv >= 31400:
-                self.iface.addTabifiedDockWidget(
-                    dockArea, self.resultsPlottingDock, tabifiedWith, True
-                )
-            else:
-                self.iface.addDockWidget(QT_DOCK_WIDGET_AREA_BOTTOM
-, self.resultsPlottingDock)
-            self.resultsPlottingDockOpened = True
-
-    def removeCmeview(self, **kwargs):
-        no_popup = kwargs["no_popup"] if "no_popup" in kwargs else False
-        resetQgisSettings(scope="Project", cmeviewer=True, feedback=False)
-        try:
-            self.resultsPlottingDock.tuPlot.clearAllPlots()
-            self.resultsPlottingDock.qgisDisconnect(completely_remove=True)
-            self.resultsPlottingDock.close()
-            self.iface.removeDockWidget(self.resultsPlottingDock)
-            del self.resultsPlottingDock
-            self.resultsPlottingDockOpened = False
-            if "feedback" in kwargs:
-                if not kwargs["feedback"]:
-                    return
-            if not no_popup:
-                QMessageBox.information(
-                    self.iface.mainWindow(), "COASTALME", "Completely Closed COASTALME Viewer"
-                )
-        except:
-            if "feedback" in kwargs:
-                if not kwargs["feedback"]:
-                    return
-            if not no_popup:
-                QMessageBox.information(
-                    self.iface.mainWindow(),
-                    "COASTALME",
-                    "ERROR closing COASTALME Viewer. Please email support@coastalme.com",
-                )
-
-    def reloadCmeview(self):
-        self.removeCmeview(feedback=False)
-        self.openResultsPlottingWindow()
-
     def addLambdaConnection(self, conn):
         self.lambdaConnections.append(conn)
 
@@ -485,3 +425,93 @@ class coastalmeqgis_menu:
             )
         except:
             pass
+        try:
+            self.process_cme_out_action.triggered.disconnect(self.process_cme_out)
+        except:
+            pass
+        try:
+            self.load_data_action.triggered.disconnect(self.load_data_action)
+        except:
+            pass
+
+    def load_data(self):
+        from .coastalmeqgis_library import browse, load_netcdf
+        nc_paths = browse(
+                self.iface.mainWindow(),
+                "existing files",
+                "coastalme/download_location",
+                "enter name of the file to open...",
+                "(*.nc *.nc)",
+                default_filename="all.nc",
+        )
+
+        for nc_path in nc_paths:
+            load_netcdf(nc_path)
+
+    def process_cme_out(self):
+        from .coastalmeqgis_library import browse, process_cme_out, load_netcdf
+        ini_paths = browse(
+                self.iface.mainWindow(),
+                "existing files",
+                "coastalme/download_location",
+                "enter name of the file to open...",
+                "(*.ini)",
+                default_filename="",
+        )
+
+        for ini_path in ini_paths:
+            nc_path = process_cme_out(ini_path)
+
+        bOpenOutput= QMessageBox.question(
+            self.iface.mainWindow(),
+            "COASTALME",
+            "Generated summary NetCDF file, would you line to load in?",
+            QT_MESSAGE_BOX_YES | QT_MESSAGE_BOX_NO | QT_MESSAGE_BOX_CANCEL,
+        )
+        if bOpenOutput == QT_MESSAGE_BOX_YES:
+            load_netcdf(nc_path)
+
+    def setup_plugin(self):
+        # package = "https://github.com/wilfchun/CoastalmeTools/releases/download/0.0.5/coastalmetools-0.0.5.tar.gz"
+        package = "/Users/wilfchun/Documents/GitHub/CoastalmeTools/dist/coastalmetools-0.0.5.tar.gz"
+        try:
+            from CoastalmeTools import Cme
+            # importlib.util.find_spec(CoastalmeTools)
+            bInstall = QMessageBox.question(
+                self.iface.mainWindow(),
+                "COASTALME",
+                "Do you want to update CoastalMeTools?",
+                QT_MESSAGE_BOX_YES | QT_MESSAGE_BOX_NO | QT_MESSAGE_BOX_CANCEL,
+            )
+            if bInstall == QT_MESSAGE_BOX_YES:
+                subprocess.check_call(["/Applications/QGIS.app/Contents/MacOS/bin/python3", "-m", "pip", "install", package])
+            else:
+                return 
+        except ImportError:
+            bInstall = QMessageBox.question(
+                self.iface.mainWindow(),
+                "COASTALME",
+                "Do you want to install CoastalMeTools?",
+                QT_MESSAGE_BOX_YES | QT_MESSAGE_BOX_NO | QT_MESSAGE_BOX_CANCEL,
+            )
+            if bInstall == QT_MESSAGE_BOX_YES:
+                subprocess.check_call(["/Applications/QGIS.app/Contents/MacOS/bin/python3", "-m", "pip", "install", package])
+            if bInstall == QT_MESSAGE_BOX_NO:
+                QMessageBox.information(self.iface.mainWindow(), "COASTALME", "Most fetures are unavailable without a finction install of CoastalmeTools")
+                return 
+        QMessageBox.information(self.iface.mainWindow(), "COASTALME", "Set-up complete")
+
+    def run_cme(self):
+        from .coastalmeqgis_library import browse, runCme
+
+        ini_paths = browse(
+                self.iface.mainWindow(),
+                "existing files",
+                "coastalme/download_location",
+                "enter name of the file to open...",
+                "(*.ini)",
+                default_filename="",
+        )
+
+        for ini_path in ini_paths:
+            nc_path = runCme(ini_path)

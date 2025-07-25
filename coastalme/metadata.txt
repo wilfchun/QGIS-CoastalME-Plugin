@@ -8,7 +8,7 @@ name=COASTALME
 qgisMinimumVersion=3.6
 qgisMaximumVersion=4.0
 supportsQt6=yes
-description=A collection of utilities for TUFLOW flood and coastal simulation in QGIS
+description=A collection of utilities for Coastalme coastal simulation in QGIS
 about=A collection of utilities for Coastalme coastal simulation in QGIS.
       Includes visualisation of results / inputs
       Editing tools
